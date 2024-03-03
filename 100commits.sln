@@ -2,6 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebApp", "src\BlazorWebApp\BlazorWebApp.csproj", "{75B75ABE-D843-4EDE-A001-647471688FDC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2412B635-3390-4040-8BD3-100C893A98EB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EADFFA21-3792-4382-99AA-35A9B45054C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestContainersPackage", "tests\TestContainersPackage\TestContainersPackage.csproj", "{201F6748-AFBC-4694-9247-C8A634E64FB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +18,13 @@ Global
 		{75B75ABE-D843-4EDE-A001-647471688FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75B75ABE-D843-4EDE-A001-647471688FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75B75ABE-D843-4EDE-A001-647471688FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{201F6748-AFBC-4694-9247-C8A634E64FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{201F6748-AFBC-4694-9247-C8A634E64FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{201F6748-AFBC-4694-9247-C8A634E64FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{201F6748-AFBC-4694-9247-C8A634E64FB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{75B75ABE-D843-4EDE-A001-647471688FDC} = {2412B635-3390-4040-8BD3-100C893A98EB}
+		{201F6748-AFBC-4694-9247-C8A634E64FB8} = {EADFFA21-3792-4382-99AA-35A9B45054C3}
 	EndGlobalSection
 EndGlobal
