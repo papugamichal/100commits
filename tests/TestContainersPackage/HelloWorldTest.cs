@@ -36,7 +36,6 @@ public class HelloWorldTest
     {
         //Arrange
         var httpClient = new HttpClient();
-
         var requestUri = new UriBuilder(Uri.UriSchemeHttp, _container.Hostname, _container.GetMappedPublicPort(ContainerPort), "uuid").Uri;
 
         //Act
