@@ -14,6 +14,7 @@ See more info here: https://100commitow.pl/
    - [ ] Setup first test
 3. Entity Framework:
    - [ ] Tbd
+   - [ ] Dapper
 4. Docker:
    - [ ] Setup startup project in docker container 
    - [ ] Setup database container for the project
