@@ -8,11 +8,11 @@ See more info here: https://100commitow.pl/
    - [ ] As a record
    - [ ] Storing in database (setup simple schema)
     
-2. Testing with `TestContainers`:
+2. [x] Testing with `TestContainers`:
    https://dotnet.testcontainers.org/ 
-   - [ ] Read documentation
+   - [x] Read documentation
    - [x] Setup first test (ContainerBuilder)
-   - [ ] Setup test with Postgresql container
+   - [x] Setup test with Postgresql container
 3. Entity Framework:
    - [ ] Tbd
    - [ ] Dapper
@@ -21,3 +21,8 @@ See more info here: https://100commitow.pl/
    - [ ] Setup database container for the project
 5. GitHub Actions:
    - [ ] Setup action to automatically make commit into Readme file with summary of all commits made that day  
+6. gRPC - AirQuality Demo Applications
+   - [ ] Setup projects
+   - [ ] Air station streaming to the server (client streaming)
+   - [ ] Server streaming to user GUI app (server streaming)
+   - [ ] Client select station to stream data (client streaming - server streaming)
