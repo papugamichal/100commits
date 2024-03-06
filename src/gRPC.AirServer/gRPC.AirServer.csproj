@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -8,4 +8,11 @@
         <RootNamespace>gRPC.Server</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Protobuf Include="Proto\contract.proto" />
+    </ItemGroup>
 </Project>
