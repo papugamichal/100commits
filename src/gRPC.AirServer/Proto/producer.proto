@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+service AirQProducer {
+  //Station streaming to the server
+  rpc StreamToServer(stream AirData) returns (google.protobuf.Empty);
+}
+
+message AirData {
+  string stationName = 1;
+  AirQMetrics metrics = 2;
+}
+
+message AirQMetrics{
+  int32 pm10 = 1;
+  int32 no2 = 2;
+  int32 so2 = 3;
+  double temperature = 4;
+  double pressure = 5;
+  double humidity = 6;
+}

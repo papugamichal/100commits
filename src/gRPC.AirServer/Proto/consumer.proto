@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+service AirQConsumer {
+  //Client ask for historical data
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  
+  //Server streaming data to the client
+  rpc StreamUpdates(StreamRequest) returns (stream AirQMetrics);
+}
+
+message GetHistoryRequest {
+  string stationName = 1;
+}
+
+message GetHistoryResponse {
+  repeated AirData history = 1;
+}
+
+message StreamRequest { 
+  string stationName = 1;
+}
+
+message AirData {
+  string created = 1;
+  AirQMetrics metrics = 2;
+}
+
+message AirQMetrics{
+  int32 pm10 = 1;
+  int32 no2 = 2;
+  int32 so2 = 3;
+  double temperature = 4;
+  double pressure = 5;
+  double humidity = 6;
+}

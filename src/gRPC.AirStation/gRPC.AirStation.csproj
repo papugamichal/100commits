@@ -12,8 +12,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="contract.proto" />
+        <Protobuf Include="..\gRPC.AirServer\Proto\contract.proto">
+            <Link>contract.proto</Link>
+        </Protobuf>
     </ItemGroup>
-
+    
+    <ItemGroup>
+      <Protobuf Include="..\gRPC.AirServer\Proto\producer.proto">
+        <Link>producer.proto</Link>
+      </Protobuf>
+    </ItemGroup>
     
 </Project>
