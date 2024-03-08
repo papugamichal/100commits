@@ -19,6 +19,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.MapGrpcService<GreeterService>();
+app.MapGrpcService<ConsumerService>();
 app.MapGet("/", context => context.Response.WriteAsJsonAsync("Hello world!"));
 
 app.Run();

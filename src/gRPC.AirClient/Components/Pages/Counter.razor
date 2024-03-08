@@ -1,20 +1,75 @@
 ﻿@page "/counter"
+@using Grpc.Net.Client
+@using Grpc.Core
+@using AirQ.Consumer
 @rendermode InteractiveServer
 
+@implements IDisposable
+
 <PageTitle>Counter</PageTitle>
-
 <h1>Counter</h1>
-
 <p role="status">Current count: @currentCount</p>
+
+<h1>Air metrics</h1>
+@if (_response is not null)
+{
+    <p>@($"Received: {_received}")</p>
+    <br/>
+    <p>@($"Humidity: {_response.Humidity}")</p>
+    <p>@($"No2: {_response.No2}")</p>
+    <p>@($"So2: {_response.So2}")</p>
+    <p>@($"Pm10: {_response.Pm10}")</p>
+    <p>@($"Temperature: {_response.Temperature}")</p>
+    <p>@($"Pressure: {_response.Pressure}")</p>
+}
+else
+{
+    <p>Waiting for data</p>
+}
+
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
     private int currentCount = 0;
+    
+    private GrpcChannel? _channel;
+    private AirQConsumer.AirQConsumerClient? _client;
+    private AirQMetrics? _response;
+    private DateTimeOffset _received = DateTimeOffset.Now;
+
+    private CancellationTokenSource _cts = new CancellationTokenSource();
+    private Task _loopTask;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _channel = GrpcChannel.ForAddress("https://localhost:5555");
+        await _channel.ConnectAsync();
+
+        _client = new AirQConsumer.AirQConsumerClient(_channel);
+        var request = _client.StreamUpdates(new StreamRequest() { StationName = "Krakow " });
+
+        _loopTask = Task.Run(async () =>
+        {
+            await foreach (var resposne in request.ResponseStream.ReadAllAsync(_cts.Token))
+            {
+                _response = resposne;
+                _received = DateTimeOffset.Now;
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+    }
 
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _loopTask.Wait();
+        _channel?.Dispose();
     }
 
 }

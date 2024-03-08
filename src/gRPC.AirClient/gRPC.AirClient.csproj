@@ -10,4 +10,10 @@
       <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Protobuf Include="..\gRPC.AirServer\Proto\consumer.proto" GrpcService="client">
+            <Link>consumer.proto</Link>
+        </Protobuf>
+    </ItemGroup>
+    
 </Project>

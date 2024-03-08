@@ -14,7 +14,7 @@
     
     <ItemGroup>
         <Protobuf Include="Proto\consumer.proto">
-          <GrpcServices>Both</GrpcServices>
+          <GrpcServices>Server</GrpcServices>
           <Access>Public</Access>
           <ProtoCompile>True</ProtoCompile>
           <CompileOutputs>True</CompileOutputs>
