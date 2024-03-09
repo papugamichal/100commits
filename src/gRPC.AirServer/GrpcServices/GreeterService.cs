@@ -1,5 +1,8 @@
+using System.Text.Json;
 using AirQ.Consumer;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using AirData = Airq.Producer.AirData;
 
 namespace gRPC.Server.GrpcServices;
 
@@ -36,5 +39,27 @@ public class ConsumerService : AirQConsumer.AirQConsumerBase
             await responseStream.WriteAsync(data);
             await Task.Delay(TimeSpan.FromSeconds(5));
         }
+    }
+}
+
+public class AirQProducer : Airq.Producer.AirQProducer.AirQProducerBase
+{
+    public override async Task<Empty> StreamToServer(IAsyncStreamReader<AirData> requestStream, ServerCallContext context)
+    {
+        try
+        {
+            var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+            await foreach (var data in requestStream.ReadAllAsync(cts.Token))
+            {
+                Console.WriteLine(
+                    $"Received data: {System.Text.Json.JsonSerializer.Serialize(data, options: new JsonSerializerOptions() { WriteIndented = true })}");
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
+        //Server 
+        return new Empty();
     }
 }
