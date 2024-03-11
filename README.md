@@ -22,7 +22,9 @@ See more info here: https://100commitow.pl/
 5. GitHub Actions:
    - [ ] Setup action to automatically make commit into Readme file with summary of all commits made that day  
 6. gRPC - AirQuality Demo Applications
-   - [ ] Setup projects
-   - [ ] Air station streaming to the server (client streaming)
+   - [x] Setup projects
+   - [x] Air station streaming to the server (client streaming)
    - [ ] Server streaming to user GUI app (server streaming)
    - [ ] Client select station to stream data (client streaming - server streaming)
+   - [ ] Server data persistance (in-memory)
+   - [ ] Server data persistance (entity framework)
