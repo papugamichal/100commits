@@ -33,31 +33,45 @@ else
 @code {
     private int currentCount = 0;
     
-    private GrpcChannel? _channel;
-    private AirQConsumer.AirQConsumerClient? _client;
     private AirQMetrics? _response;
     private DateTimeOffset _received = DateTimeOffset.Now;
 
-    private CancellationTokenSource _cts = new CancellationTokenSource();
-    private Task _loopTask;
+    private CancellationTokenSource? _cts;
+    private Task? _clientTask;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        _channel = GrpcChannel.ForAddress("https://localhost:5555");
-        await _channel.ConnectAsync();
+        _cts = new CancellationTokenSource();
+        _clientTask = InitializeClientThreadAsync(_cts.Token);
+    }
 
-        _client = new AirQConsumer.AirQConsumerClient(_channel);
-        var request = _client.StreamUpdates(new StreamRequest() { StationName = "Krakow " });
-
-        _loopTask = Task.Run(async () =>
+    private Task InitializeClientThreadAsync(CancellationToken token)
+    {
+        return Task.Run(async () =>
         {
-            await foreach (var resposne in request.ResponseStream.ReadAllAsync(_cts.Token))
+            try
             {
-                _response = resposne;
-                _received = DateTimeOffset.Now;
-                await InvokeAsync(StateHasChanged);
+                using var channel = GrpcChannel.ForAddress("https://localhost:5555");
+                await channel.ConnectAsync(token);
+
+                var consumer = new AirQConsumer.AirQConsumerClient(channel);
+                var request = consumer.StreamUpdates(new StreamRequest()
+                {
+                    StationName = "Krakow"
+                });
+
+                await foreach (var response in request.ResponseStream.ReadAllAsync(token))
+                {
+                    _response = response;
+                    _received = DateTimeOffset.Now;
+                    await InvokeAsync(StateHasChanged);
+                }
             }
-        });
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }, token);
     }
 
     private void IncrementCount()
@@ -67,9 +81,8 @@ else
 
     public void Dispose()
     {
-        _cts.Cancel();
-        _loopTask.Wait();
-        _channel?.Dispose();
+        _cts?.Cancel();
+        _clientTask?.Wait();
     }
 
 }
