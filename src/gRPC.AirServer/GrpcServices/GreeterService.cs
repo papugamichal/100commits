@@ -40,6 +40,14 @@ public class ConsumerService : AirQConsumer.AirQConsumerBase
             await Task.Delay(TimeSpan.FromSeconds(5));
         }
     }
+
+    public override async Task StreamUpdates2(IAsyncStreamReader<StreamRequest> requestStream, IServerStreamWriter<AirQMetrics> responseStream, ServerCallContext context)
+    {
+        var reqId = context.GetHttpContext().TraceIdentifier;
+        
+        await responseStream.WriteAsync(new AirQMetrics());
+
+    }
 }
 
 public class AirQProducer : Airq.Producer.AirQProducer.AirQProducerBase

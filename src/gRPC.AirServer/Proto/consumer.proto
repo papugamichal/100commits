@@ -10,6 +10,9 @@ service AirQConsumer {
   
   //Server streaming data to the client
   rpc StreamUpdates(StreamRequest) returns (stream AirQMetrics);
+  
+  //Client streaming - city, server streaming - data
+  rpc StreamUpdates2(stream StreamRequest) returns (stream AirQMetrics);
 }
 
 message GetHistoryRequest {
