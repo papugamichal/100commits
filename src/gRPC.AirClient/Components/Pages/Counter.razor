@@ -1,7 +1,8 @@
 ﻿@page "/counter"
-@using Grpc.Net.Client
-@using Grpc.Core
 @using AirQ.Consumer
+@using Grpc.Core
+@using Grpc.Net.Client
+@using System.Threading.Channels
 @rendermode InteractiveServer
 
 @implements IDisposable
@@ -10,6 +11,10 @@
 <h1>Counter</h1>
 <p role="status">Current count: @currentCount</p>
 
+
+<p>Station name</p>
+<input type="text" @bind-value="@_stationName" placeholder="Enter station name"/>
+<button class="btn btn-primary" @onclick="@ReqData">Req</button>
 <h1>Air metrics</h1>
 @if (_response is not null)
 {
@@ -27,10 +32,10 @@ else
     <p>Waiting for data</p>
 }
 
-
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
+    private string _stationName;
     private int currentCount = 0;
     
     private AirQMetrics? _response;
@@ -39,6 +44,8 @@ else
     private CancellationTokenSource? _cts;
     private Task? _clientTask;
 
+    private Channel<string> _stationNameChannel = Channel.CreateUnbounded<string>();
+    
     protected override void OnInitialized()
     {
         _cts = new CancellationTokenSource();
@@ -55,7 +62,7 @@ else
                 await channel.ConnectAsync(token);
 
                 var consumer = new AirQConsumer.AirQConsumerClient(channel);
-                var request = consumer.StreamUpdates(new StreamRequest()
+                /*var request = consumer.StreamUpdates(new StreamRequest()
                 {
                     StationName = "Krakow"
                 });
@@ -65,7 +72,29 @@ else
                     _response = response;
                     _received = DateTimeOffset.Now;
                     await InvokeAsync(StateHasChanged);
-                }
+                }*/
+
+                var biDirectionalStream = consumer.GetBidirectionalUpdatesStream();
+                var publisher = Task.Run(async () =>
+                {
+                    await foreach (var item in _stationNameChannel.Reader.ReadAllAsync(token))
+                    {
+                        await biDirectionalStream.RequestStream.WriteAsync(new StreamRequest() { StationName = item }, token);
+                    }
+                });
+
+                var receiver = Task.Run(async () =>
+                {
+                    await foreach (var item in biDirectionalStream.ResponseStream.ReadAllAsync(cancellationToken: token))
+                    {
+                        _response = item;
+                        _received = DateTimeOffset.Now;
+                        await InvokeAsync(StateHasChanged);
+                    }
+                    
+                });
+
+                await Task.WhenAll(publisher, receiver);
             }
             catch (Exception e)
             {
@@ -74,6 +103,12 @@ else
         }, token);
     }
 
+
+    private async Task ReqData()
+    {
+        await _stationNameChannel.Writer.WriteAsync(_stationName);
+    }
+    
     private void IncrementCount()
     {
         currentCount++;
