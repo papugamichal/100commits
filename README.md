@@ -24,7 +24,8 @@ See more info here: https://100commitow.pl/
 6. gRPC - AirQuality Demo Applications
    - [x] Setup projects
    - [x] Air station streaming to the server (client streaming)
-   - [ ] Server streaming to user GUI app (server streaming)
-   - [ ] Client select station to stream data (client streaming - server streaming)
+   - [x] Server streaming to user GUI app (server streaming)
+   - [x] Client select station to stream data (client streaming - server streaming)
    - [ ] Server data persistance (in-memory)
    - [ ] Server data persistance (entity framework)
+7. UI localization with IStringLocalizer
