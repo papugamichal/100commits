@@ -19,7 +19,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.MapGrpcService<GreeterService>();
-app.MapGrpcService<ConsumerService>();
+app.MapGrpcService<AirQConsumer>();
 app.MapGrpcService<AirQProducer>();
 app.MapGet("/", context => context.Response.WriteAsJsonAsync("Hello world!"));
 
