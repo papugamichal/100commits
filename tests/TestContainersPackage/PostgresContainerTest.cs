@@ -25,6 +25,7 @@ public class PostgresContainerTest
     public async Task Cleanup()
     {
         await _container.StopAsync();
+        await _container.DisposeAsync();
     }
     
     [Test]

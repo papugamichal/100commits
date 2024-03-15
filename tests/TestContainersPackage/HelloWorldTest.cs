@@ -29,6 +29,7 @@ public class HelloWorldTest
     public async Task Cleanup()
     {
         await _container.StopAsync();
+        await _container.DisposeAsync();
     }
     
     [Test]
