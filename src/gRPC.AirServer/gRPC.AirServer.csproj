@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>gRPC.Server</RootNamespace>
@@ -14,20 +14,27 @@
     
     <ItemGroup>
         <Protobuf Include="Proto\consumer.proto">
+            <GrpcServices>Server</GrpcServices>
+            <Access>Public</Access>
+            <ProtoCompile>True</ProtoCompile>
+            <CompileOutputs>True</CompileOutputs>
+            <OutputDir>obj\Debug\net8.0\</OutputDir>
+            <Generator>MSBuild:Compile</Generator>
+        </Protobuf>
+        <Protobuf Include="Proto\contract.proto">
+            <GrpcServices>Server</GrpcServices>
+            <Access>Public</Access>
+            <ProtoCompile>True</ProtoCompile>
+            <CompileOutputs>True</CompileOutputs>
+            <OutputDir>obj\Debug\net8.0\</OutputDir>
+            <Generator>MSBuild:Compile</Generator>
+        </Protobuf>
+        <Protobuf Include="Proto\producer.proto">
           <GrpcServices>Server</GrpcServices>
           <Access>Public</Access>
           <ProtoCompile>True</ProtoCompile>
           <CompileOutputs>True</CompileOutputs>
-          <OutputDir>obj\Debug\net7.0\</OutputDir>
-          <Generator>MSBuild:Compile</Generator>
-        </Protobuf>
-        <Protobuf Include="Proto\contract.proto" />
-        <Protobuf Include="Proto\producer.proto">
-          <GrpcServices>Both</GrpcServices>
-          <Access>Public</Access>
-          <ProtoCompile>True</ProtoCompile>
-          <CompileOutputs>True</CompileOutputs>
-          <OutputDir>obj\Debug\net7.0\</OutputDir>
+          <OutputDir>obj\Debug\net8.0\</OutputDir>
           <Generator>MSBuild:Compile</Generator>
         </Protobuf>
     </ItemGroup>
