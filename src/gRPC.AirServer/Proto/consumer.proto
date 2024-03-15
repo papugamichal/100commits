@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package airQ.consumer;
+package AirQ.Consumer;
 
 service AirQConsumer {
   //Client ask for historical data

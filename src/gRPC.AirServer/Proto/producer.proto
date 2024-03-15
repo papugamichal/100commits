@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
-package airq.producer;
+package AirQ.Producer;
 
 service AirQProducer {
   //Station streaming to the server

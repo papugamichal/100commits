@@ -1,20 +1,7 @@
-using System.Threading.Channels;
 using AirQ.Consumer;
 using Grpc.Core;
 
 namespace gRPC.Server.GrpcServices;
-
-internal class DataProvider
-{
-    private readonly Dictionary<StationName, List<Channel<AirQMetrics>>> _stationUpdatesListeners = new();
-    
-    public IAsyncEnumerable<AirQMetrics> ProvideStreamFor(StationName name, CancellationToken contextCancellationToken)
-    {
-        var channel = Channel.CreateBounded<AirQMetrics>();   
-        
-        return null;
-    }
-}
 
 internal record StationName(string Name)
 {
@@ -30,7 +17,7 @@ internal class AirQConsumer : AirQ.Consumer.AirQConsumer.AirQConsumerBase
         _dataProvider = dataProvider;
     }
 
-    public override async Task StreamUpdates(StreamRequest request, IServerStreamWriter<AirQMetrics> responseStream, ServerCallContext context)
+    public override async Task StreamUpdates(StreamRequest request, IServerStreamWriter<AirQ.Consumer.AirQMetrics> responseStream, ServerCallContext context)
     {
         await foreach (var update in _dataProvider.ProvideStreamFor(new StationName(request.StationName), context.CancellationToken))
         {
@@ -48,30 +35,49 @@ internal class AirQConsumer : AirQ.Consumer.AirQConsumer.AirQConsumerBase
         
         var requestStreamTask = Task.Run(async () =>
         {
-            await foreach (var item in requestStream.ReadAllAsync(context.CancellationToken))
+            try
             {
-                if (item.StationName == stationName)
-                    continue;
+                await foreach (var item in requestStream.ReadAllAsync(context.CancellationToken))
+                {
+                    if (item.StationName == stationName)
+                        continue;
 
-                stationUpdatesTokenSource.Cancel();
-                stationName = item.StationName;
-                stationUpdatesTokenSource = new CancellationTokenSource();
-                
-                Console.WriteLine($"Request `{nameof(GetBidirectionalUpdatesStream)}`, id: `{reqId}`. New arg: {stationName}");
+                    await stationUpdatesTokenSource.CancelAsync();
+                    stationName = item.StationName;
+
+                    Console.WriteLine(
+                        $"Request `{nameof(GetBidirectionalUpdatesStream)}`, id: `{reqId}`. New arg: {stationName}");
+                }
+            }
+            catch (OperationCanceledException e)
+            {
+                if (context.CancellationToken.IsCancellationRequested)
+                    Console.WriteLine($"GRPC request `{reqId}` cancelled");
             }
         });
 
         var responseStreamTask = Task.Run(async () =>
         {
-            while (context.CancellationToken.IsCancellationRequested != false)
+            while (context.CancellationToken.IsCancellationRequested == false)
             {
-                var linkedTokenSource =
-                    CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken,
-                        stationUpdatesTokenSource.Token);
-                await foreach (var update in _dataProvider.ProvideStreamFor(new StationName(stationName),
-                                   linkedTokenSource.Token))
+                try
                 {
-                    await responseStream.WriteAsync(update, context.CancellationToken);
+                    var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, stationUpdatesTokenSource.Token);
+                    await foreach (var update in _dataProvider.ProvideStreamFor(new StationName(stationName), linkedTokenSource.Token))
+                    {
+                        await responseStream.WriteAsync(update, context.CancellationToken);
+                    }
+                }
+                catch (OperationCanceledException e)
+                {
+                    if (context.CancellationToken.IsCancellationRequested)
+                        Console.WriteLine($"GRPC request `{reqId}` cancelled");
+
+                    if (stationUpdatesTokenSource.IsCancellationRequested)
+                    {
+                        Console.WriteLine($"Req: `{reqId}` station changed");
+                        stationUpdatesTokenSource = new CancellationTokenSource();
+                    }
                 }
             }
         });

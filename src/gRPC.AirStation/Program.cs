@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Airq.Producer;
+using AirQ.Producer;
 using Grpc.Net.Client;
 
 Console.WriteLine("Hello, World!");

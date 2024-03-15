@@ -2,6 +2,8 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<DataProvider>();
+
 // Add services to the container.
 builder.Services.AddGrpc();
 var app = builder.Build();

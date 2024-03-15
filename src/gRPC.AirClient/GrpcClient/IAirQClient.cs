@@ -13,6 +13,6 @@ public class AirQClient : IAirQClient
     
     public IAsyncEnumerable<AirQMetrics> GetDataAsync()
     {
-        return Array.Empty<AirQMetrics>().AsParallel();
+        return null!;
     }
 }
