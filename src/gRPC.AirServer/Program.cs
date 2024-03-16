@@ -1,8 +1,11 @@
 ﻿using gRPC.Server.GrpcServices;
+using gRPC.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<Repository>();
 builder.Services.AddSingleton<DataProvider>();
+
 
 // Add services to the container.
 builder.Services.AddGrpc();

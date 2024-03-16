@@ -1,25 +1,29 @@
 using AirQ.Consumer;
 using Grpc.Core;
+using gRPC.Server.Services;
 
 namespace gRPC.Server.GrpcServices;
 
-internal record StationName(string Name)
+internal record StationName
 {
-    public string Name { get; init; } = Name.Trim().ToLower();
-}
-
-internal class AirQConsumer : AirQ.Consumer.AirQConsumer.AirQConsumerBase
-{
-    private readonly DataProvider _dataProvider;
-
-    public AirQConsumer(DataProvider dataProvider)
+    public StationName(string name)
     {
-        _dataProvider = dataProvider;
+        Name = name.Trim().ToLower();
     }
 
+    public string Name { get; init; } 
+
+    public void Deconstruct(out string Name)
+    {
+        Name = this.Name;
+    }
+}
+
+internal class AirQConsumer(DataProvider dataProvider) : AirQ.Consumer.AirQConsumer.AirQConsumerBase
+{
     public override async Task StreamUpdates(StreamRequest request, IServerStreamWriter<AirQ.Consumer.AirQMetrics> responseStream, ServerCallContext context)
     {
-        await foreach (var update in _dataProvider.ProvideStreamFor(new StationName(request.StationName), context.CancellationToken))
+        await foreach (var update in dataProvider.ProvideStreamFor(new StationName(request.StationName), context.CancellationToken))
         {
             await responseStream.WriteAsync(update);
         }
@@ -63,7 +67,7 @@ internal class AirQConsumer : AirQ.Consumer.AirQConsumer.AirQConsumerBase
                 try
                 {
                     var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, stationUpdatesTokenSource.Token);
-                    await foreach (var update in _dataProvider.ProvideStreamFor(new StationName(stationName), linkedTokenSource.Token))
+                    await foreach (var update in dataProvider.ProvideStreamFor(new StationName(stationName), linkedTokenSource.Token))
                     {
                         await responseStream.WriteAsync(update, context.CancellationToken);
                     }
