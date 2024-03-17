@@ -46,8 +46,8 @@ internal class AirQConsumer(DataProvider dataProvider) : AirQ.Consumer.AirQConsu
                     if (item.StationName == stationName)
                         continue;
 
-                    await stationUpdatesTokenSource.CancelAsync();
                     stationName = item.StationName;
+                    await stationUpdatesTokenSource.CancelAsync();
 
                     Console.WriteLine(
                         $"Request `{nameof(GetBidirectionalUpdatesStream)}`, id: `{reqId}`. New arg: {stationName}");

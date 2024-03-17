@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using AirQ.Producer;
 using gRPC.Server.GrpcServices;
+using gRPC.Server.Persistence;
 
 namespace gRPC.Server.Services;
 
@@ -8,13 +9,17 @@ internal sealed class DataProvider(Repository repository)
 {
     private readonly Dictionary<StationName, List<Channel<AirQ.Consumer.AirQMetrics>>> _stationUpdatesListeners = new();
 
+    /// <summary>
+    /// Air station provides to server update package
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="update"></param>
     public async Task ProvideStationUpdate(StationName name, AirQ.Producer.AirQMetrics update)
     {
         var updateForConsumer = ToConsumer(update);
         await repository.Persist(name, updateForConsumer);
         
         Channel<AirQ.Consumer.AirQMetrics>[] listeners;
-        
         lock (_stationUpdatesListeners)
         {
             listeners = _stationUpdatesListeners.TryGetValue(name, out var data)
@@ -24,6 +29,12 @@ internal sealed class DataProvider(Repository repository)
         await Task.WhenAll(listeners.Select(listener => listener.Writer.WriteAsync(updateForConsumer).AsTask()));
     }
     
+    /// <summary>
+    /// Server provides updates stream of selected station
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="contextCancellationToken"></param>
+    /// <returns></returns>
     public IAsyncEnumerable<AirQ.Consumer.AirQMetrics> ProvideStreamFor(StationName name, CancellationToken contextCancellationToken)
     {
         var subscription = Channel.CreateUnbounded<AirQ.Consumer.AirQMetrics>();
