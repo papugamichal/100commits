@@ -7,21 +7,25 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<Repository>();
-builder.Services.AddSingleton<DataProvider>();
+//builder.Services.AddSingleton<IRepository, DatabaseRepository>();
+builder.Services.AddScoped<IRepository, DatabaseRepository>();
+builder.Services.AddScoped<DataProvider>();
 
 builder.Services.AddDbContext<AirQDbContext>(options =>
 {
-    var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    /*var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     var dbPath = System.IO.Path.Join(path, "station_updates.db");
-
     var connStr = new SqliteConnectionStringBuilder().DataSource = dbPath;
     options.UseSqlite(connStr);
+    */
+    
+    options.UseSqlite("Data Source=mydatabase.db");
 });
 
 // Add services to the container.
 builder.Services.AddGrpc();
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

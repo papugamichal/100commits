@@ -5,9 +5,9 @@ using gRPC.Server.Persistence;
 
 namespace gRPC.Server.Services;
 
-internal sealed class DataProvider(Repository repository)
+internal sealed class DataProvider(IRepository repository)
 {
-    private readonly Dictionary<StationName, List<Channel<AirQ.Consumer.AirQMetrics>>> _stationUpdatesListeners = new();
+    private static readonly Dictionary<StationName, List<Channel<AirQ.Consumer.AirQMetrics>>> StationUpdatesListeners = new();
 
     /// <summary>
     /// Air station provides to server update package
@@ -20,9 +20,9 @@ internal sealed class DataProvider(Repository repository)
         await repository.Persist(name, updateForConsumer);
         
         Channel<AirQ.Consumer.AirQMetrics>[] listeners;
-        lock (_stationUpdatesListeners)
+        lock (StationUpdatesListeners)
         {
-            listeners = _stationUpdatesListeners.TryGetValue(name, out var data)
+            listeners = StationUpdatesListeners.TryGetValue(name, out var data)
                 ? data.ToArray()
                 : Array.Empty<Channel<AirQ.Consumer.AirQMetrics>>();
         }
@@ -39,24 +39,24 @@ internal sealed class DataProvider(Repository repository)
     {
         var subscription = Channel.CreateUnbounded<AirQ.Consumer.AirQMetrics>();
         
-        lock (_stationUpdatesListeners)
+        lock (StationUpdatesListeners)
         {
-            if (_stationUpdatesListeners.TryGetValue(name, out var listeners))
+            if (StationUpdatesListeners.TryGetValue(name, out var listeners))
             {
                 listeners.Add(subscription);
 
             }
             else
             {
-                _stationUpdatesListeners.Add(name, new List<Channel<AirQ.Consumer.AirQMetrics>> { subscription });
+                StationUpdatesListeners.Add(name, new List<Channel<AirQ.Consumer.AirQMetrics>> { subscription });
             }
         }
         
         contextCancellationToken.Register(() =>
         {
-            lock (_stationUpdatesListeners)
+            lock (StationUpdatesListeners)
             {
-                if (_stationUpdatesListeners.TryGetValue(name, out var list))
+                if (StationUpdatesListeners.TryGetValue(name, out var list))
                     list.Remove(subscription);
             }
         });
