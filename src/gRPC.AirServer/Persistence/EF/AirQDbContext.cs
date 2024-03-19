@@ -3,12 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gRPC.Server.Persistence.EF;
 
-public class AirQDbContext : DbContext
-{    
-    public AirQDbContext(DbContextOptions<AirQDbContext> options) : base(options)
-    {
-    }
-    
+public class AirQDbContext(DbContextOptions<AirQDbContext> options) : DbContext(options)
+{
     public DbSet<StationUpdate> StationUpdate { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
