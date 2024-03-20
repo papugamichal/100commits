@@ -8,8 +8,7 @@ See more info here: https://100commitow.pl/
    - [ ] As a record
    - [ ] Storing in database (setup simple schema)
     
-2. [x] Testing with `TestContainers`:
-   https://dotnet.testcontainers.org/ 
+2. [x] Testing with `TestContainers` (https://dotnet.testcontainers.org/):
    - [x] Read documentation
    - [x] Setup first test (ContainerBuilder)
    - [x] Setup test with Postgresql container
@@ -28,4 +27,5 @@ See more info here: https://100commitow.pl/
    - [x] Client select station to stream data (client streaming - server streaming)
    - [ ] Server data persistance (in-memory)
    - [ ] Server data persistance (entity framework)
-7. UI localization with IStringLocalizer
+7. UI localization with IStringLocalizer:
+   - [ ] AirQ.Client UI (simple graph visualization + updates)

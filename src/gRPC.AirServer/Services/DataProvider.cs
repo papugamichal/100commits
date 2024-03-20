@@ -66,7 +66,7 @@ internal sealed class DataProvider(IRepository repository)
     
     private static AirQ.Consumer.AirQMetrics ToConsumer(AirQMetrics dataMetrics)
     {
-        return new AirQ.Consumer.AirQMetrics()
+        return new AirQ.Consumer.AirQMetrics
         {
             Humidity = dataMetrics.Humidity,
             No2 = dataMetrics.No2,
