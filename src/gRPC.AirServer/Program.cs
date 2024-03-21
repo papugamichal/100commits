@@ -2,23 +2,14 @@
 using gRPC.Server.Persistence;
 using gRPC.Server.Persistence.EF;
 using gRPC.Server.Services;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//builder.Services.AddSingleton<IRepository, DatabaseRepository>();
 builder.Services.AddScoped<IRepository, DatabaseRepository>();
 builder.Services.AddScoped<DataProvider>();
 
 builder.Services.AddDbContext<AirQDbContext>(options =>
 {
-    /*var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    var dbPath = System.IO.Path.Join(path, "station_updates.db");
-    var connStr = new SqliteConnectionStringBuilder().DataSource = dbPath;
-    options.UseSqlite(connStr);
-    */
-    
     options.UseSqlite("Data Source=mydatabase.db");
 });
 

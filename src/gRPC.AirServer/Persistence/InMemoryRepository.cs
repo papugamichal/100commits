@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Net.Mime;
 using gRPC.Server.GrpcServices;
 
 namespace gRPC.Server.Persistence;
