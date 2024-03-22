@@ -1,4 +1,5 @@
 ﻿using gRPC.Server.GrpcServices;
+using gRPC.Server.GrpcServices.Interceptor;
 using gRPC.Server.Persistence;
 using gRPC.Server.Persistence.EF;
 using gRPC.Server.Services;
@@ -14,7 +15,10 @@ builder.Services.AddDbContext<AirQDbContext>(options =>
 });
 
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(options =>
+{
+    options.Interceptors.Add<TracingInterceptor>();
+});
 var app = builder.Build();
 
 
