@@ -1,6 +1,7 @@
-# 100commits
-See more info here: https://100commitow.pl/ 
+[![.NET](https://github.com/papugamichal/100commits/actions/workflows/dotnet.yml/badge.svg)](https://github.com/papugamichal/100commits/actions/workflows/dotnet.yml)
 
+# 100commits
+See more info here: https://100commitow.pl/
 
 ### Ideas to implement and test:
 1. Value Objets:
@@ -20,6 +21,7 @@ See more info here: https://100commitow.pl/
    - [ ] Setup database container for the project
 5. GitHub Actions:
    - [ ] Setup action to automatically make commit into Readme file with summary of all commits made that day  
+   - [x] Setup action to build & run tests on push
 6. gRPC - AirQuality Demo Applications
    - [x] Setup projects
    - [x] Air station streaming to the server (client streaming)
