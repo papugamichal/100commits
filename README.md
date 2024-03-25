@@ -27,7 +27,7 @@ See more info here: https://100commitow.pl/
    - [x] Air station streaming to the server (client streaming)
    - [x] Server streaming to user GUI app (server streaming)
    - [x] Client select station to stream data (client streaming - server streaming)
-   - [ ] Server data persistance (in-memory)
+   - [x] Server data persistance (in-memory)
    - [ ] Server data persistance (entity framework)
 7. UI localization with IStringLocalizer:
    - [ ] AirQ.Client UI (simple graph visualization + updates)
