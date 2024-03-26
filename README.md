@@ -31,3 +31,5 @@ See more info here: https://100commitow.pl/
    - [ ] Server data persistance (entity framework)
 7. UI localization with IStringLocalizer:
    - [ ] AirQ.Client UI (simple graph visualization + updates)
+8. Idea: gRPC test integration test fixture for client/server
+   - [ ] Test fixture
