@@ -33,3 +33,5 @@ See more info here: https://100commitow.pl/
    - [ ] AirQ.Client UI (simple graph visualization + updates)
 8. Idea: gRPC test integration test fixture for client/server
    - [ ] Test fixture
+9. Architecture:
+   -[ ] ArchUnitNET
