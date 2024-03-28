@@ -20,4 +20,11 @@
         <PackageReference Include="TngTech.ArchUnitNET.NUnit" Version="0.10.6" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\ArchUnit\ArchUnit.Application\ArchUnit.Application.csproj" />
+      <ProjectReference Include="..\..\src\ArchUnit\ArchUnit.Core\ArchUnit.Core.csproj" />
+      <ProjectReference Include="..\..\src\ArchUnit\ArchUnit.Infra\ArchUnit.Infra.csproj" />
+      <ProjectReference Include="..\..\src\ArchUnit\ArchUnit.Web\ArchUnit.Web.csproj" />
+    </ItemGroup>
+
 </Project>
