@@ -1,4 +1,6 @@
-﻿namespace ArchUnit.Core;
+﻿using ArchUnit.Infra;
+
+namespace ArchUnit.Core;
 
 public class Class1
 {

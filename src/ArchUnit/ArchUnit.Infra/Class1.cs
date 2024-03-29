@@ -1,5 +1,6 @@
 ﻿namespace ArchUnit.Infra;
 
-public class Class1
+internal class Class1
 {
+    public InfraType A { get; set; }
 }

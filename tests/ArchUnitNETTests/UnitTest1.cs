@@ -3,8 +3,8 @@ namespace ArchUnitNETTests;
 public class Tests
 {
     private static readonly System.Reflection.Assembly CoreAssembly = typeof(ArchUnit.Core.Class1).Assembly;
-    private static readonly System.Reflection.Assembly ApplicationAssembly = typeof(ArchUnit.Application.Class1).Assembly;
-    private static readonly System.Reflection.Assembly InfraAssembly = typeof(ArchUnit.Infra.Class1).Assembly;
+    private static readonly System.Reflection.Assembly ApplicationAssembly = typeof(ArchUnit.Application.SomeStruct).Assembly;
+    private static readonly System.Reflection.Assembly InfraAssembly = typeof(ArchUnit.Infra.InfraType).Assembly;
     private static readonly System.Reflection.Assembly WebAssembly = typeof(ArchUnit.Web.Class1).Assembly;
     
     private static readonly Architecture Architecture = new ArchLoader().LoadAssemblies(
@@ -12,13 +12,8 @@ public class Tests
         ApplicationAssembly,
         InfraAssembly,
         WebAssembly
-        // System.Reflection.Assembly.Load("ExampleClassAssemblyName"),
-        // System.Reflection.Assembly.Load("ForbiddenClassAssemblyName")
     ).Build();
-    // replace <ExampleClass> and <ForbiddenClass> with classes from the assemblies you want to test
-
-    //declare variables you'll use throughout your tests up here
-    //use As() to give them a custom description
+    
     private readonly IObjectProvider<IType> CoreLayer = 
         ArchRuleDefinition.Types().That().ResideInAssembly(CoreAssembly).As("Core Layer");
     private readonly IObjectProvider<IType> ApplicationLayer = 
@@ -60,12 +55,32 @@ public class Tests
     }
 
     [Test]
-    public void AggregateDefinedInApplicationViolatesTheRule()
+    public void AggregatesShouldBeDefinedInCore()
     {
-        var applicationLayerDependsOnCore = 
+        var aggregatesAreInCoreLayer = 
             ArchRuleDefinition.Classes().That().HaveNameEndingWith("Aggregate").Should().Be(CoreLayer)
-        .Because("Aggregates should live in the CORE layer");
+        .Because("Aggregates should live in the Core layer");
 
-        applicationLayerDependsOnCore.Check(Architecture);
+        aggregatesAreInCoreLayer.Check(Architecture);
+    }
+    
+    [Test]
+    public void InfraTypesShouldNotBeAccessedInCore()
+    {
+        var aggregatesAreInCoreLayer = 
+            ArchRuleDefinition.Types().That().ResideInAssembly(CoreAssembly).Should().NotDependOnAny(InfraLayer)
+                .Because("Infra types should not be accessed in Core");
+
+        aggregatesAreInCoreLayer.Check(Architecture);
+    }
+    
+    [Test]
+    public void ApplicationTypesShouldNotBePublic()
+    {
+        var aggregatesAreInCoreLayer = 
+            ArchRuleDefinition.Classes().That().ResideInAssembly(ApplicationAssembly).Should().NotBePublic()
+                .Because("Application types should not be public");
+
+        aggregatesAreInCoreLayer.Check(Architecture);
     }
 }
