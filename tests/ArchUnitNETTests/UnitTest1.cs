@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ArchUnitNETTests;
 
 public class Tests
@@ -57,30 +59,48 @@ public class Tests
     [Test]
     public void AggregatesShouldBeDefinedInCore()
     {
-        var aggregatesAreInCoreLayer = 
+        var rule = 
             ArchRuleDefinition.Classes().That().HaveNameEndingWith("Aggregate").Should().Be(CoreLayer)
         .Because("Aggregates should live in the Core layer");
 
-        aggregatesAreInCoreLayer.Check(Architecture);
+        rule.Check(Architecture);
     }
     
     [Test]
     public void InfraTypesShouldNotBeAccessedInCore()
     {
-        var aggregatesAreInCoreLayer = 
+        var rule = 
             ArchRuleDefinition.Types().That().ResideInAssembly(CoreAssembly).Should().NotDependOnAny(InfraLayer)
                 .Because("Infra types should not be accessed in Core");
 
-        aggregatesAreInCoreLayer.Check(Architecture);
+        rule.Check(Architecture);
     }
     
     [Test]
     public void ApplicationTypesShouldNotBePublic()
     {
-        var aggregatesAreInCoreLayer = 
+        var rule = 
             ArchRuleDefinition.Classes().That().ResideInAssembly(ApplicationAssembly).Should().NotBePublic()
                 .Because("Application types should not be public");
 
-        aggregatesAreInCoreLayer.Check(Architecture);
+        rule.Check(Architecture);
     }
+
+    [Test]
+    public void ViewModelsAreDefinedInWeb()
+    {
+        var rule = ArchRuleDefinition.Classes().That().HaveNameEndingWith("ViewModel").Should()
+            .ResideInAssembly(WebAssembly).Because("ViewModel types should be defined in Web");
+        
+        rule.Check(Architecture);
+    }
+
+    [Test]
+    public void ViewModelsShouldBeDecoratedWithDisplayAttribute()
+    {
+        var rule = ArchRuleDefinition.Classes().That().HaveNameEndingWith("ViewModel").Should()
+            .HaveAnyAttributes(typeof(DisplayAttribute)).Because("ViewModel need Display attribute");
+        rule.Check(Architecture);
+    }
+    
 }
