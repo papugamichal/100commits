@@ -102,5 +102,14 @@ public class Tests
             .HaveAnyAttributes(typeof(DisplayAttribute)).Because("ViewModel need Display attribute");
         rule.Check(Architecture);
     }
+    //
+    // [Test]
+    // public void X()
+    // {
+    //     Assert.Fail();
+    //     var rule = ArchRuleDefinition.Types().Should()
+    //         .AdhereToPlantUmlDiagram("t.puml");
+    //     rule.Check(Architecture);
+    // }
     
 }

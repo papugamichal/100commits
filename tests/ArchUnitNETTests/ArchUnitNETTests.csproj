@@ -27,4 +27,13 @@
       <ProjectReference Include="..\..\src\ArchUnit\ArchUnit.Web\ArchUnit.Web.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="test.puml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="t.puml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    
 </Project>
