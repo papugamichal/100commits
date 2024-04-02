@@ -1,0 +1,13 @@
+@startuml
+
+package gRPC.Air* {
+[AirClient] <<gRPC.AirClient.*>> as client
+[AirServer] <<gRPC.AirServer.*>> as server
+[AirStation] <<gRPC.AirStation.*>> as station
+
+station --> server : station streaming \n(client-streaming)
+server <--> client  : bi-directional streaming
+
+}
+
+@enduml

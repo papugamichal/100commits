@@ -28,6 +28,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchUnit.Infra", "src\ArchU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchUnit.Web", "src\ArchUnit\ArchUnit.Web\ArchUnit.Web.csproj", "{E9204C9A-1C23-4242-A4B0-1637415F2A02}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PlantUML", "PlantUML", "{85996BC8-AA91-45D6-A671-6762F9B3F2AA}"
+	ProjectSection(SolutionItems) = preProject
+		gRPC.puml = gRPC.puml
+		archUnit.puml = archUnit.puml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,5 +94,6 @@ Global
 		{8863EF37-C3BC-4086-B69F-65776DD84E77} = {F95BFF51-EFB8-4C02-9221-157FAA2AE229}
 		{B61AF982-F881-4AA7-A2B9-DAA20DAC00CC} = {F95BFF51-EFB8-4C02-9221-157FAA2AE229}
 		{E9204C9A-1C23-4242-A4B0-1637415F2A02} = {F95BFF51-EFB8-4C02-9221-157FAA2AE229}
+		{85996BC8-AA91-45D6-A671-6762F9B3F2AA} = {2412B635-3390-4040-8BD3-100C893A98EB}
 	EndGlobalSection
 EndGlobal
