@@ -1,0 +1,17 @@
+@startuml gRPC.Air.sequences
+
+actor Alice
+participant station
+hnote over station : over note
+
+station -> station : initialization 
+activate station
+station -> server : establish connection
+station --> server : station streaming \n(client-streaming)
+deactivate station
+
+client -> client : initialization
+client -> server : establish connection
+server <--> client  : bi-directional streaming
+
+@enduml

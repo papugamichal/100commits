@@ -30,8 +30,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchUnit.Web", "src\ArchUni
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PlantUML", "PlantUML", "{85996BC8-AA91-45D6-A671-6762F9B3F2AA}"
 	ProjectSection(SolutionItems) = preProject
-		gRPC.puml = gRPC.puml
+		gRPC_package.puml = gRPC_package.puml
 		archUnit.puml = archUnit.puml
+		gRPC_seq.puml = gRPC_seq.puml
 	EndProjectSection
 EndProject
 Global
