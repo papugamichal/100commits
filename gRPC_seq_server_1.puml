@@ -1,0 +1,51 @@
+@startuml gRPC.Air.Server.Sequences
+
+hide footbox
+
+participant Server
+participant AirQConsumer
+participant GetBidirectionalUpdatesStream
+
+participant Client order -1
+
+Server -> AirQConsumer : configure grpc service
+Client -> Server : request endpoint
+
+note over Server : gRPC endpoint: AirQConsumer/GetBidirectionalUpdatesStream 
+
+Server -> AirQConsumer : create new service instance
+activate AirQConsumer
+
+AirQConsumer -> GetBidirectionalUpdatesStream : invoke a method
+activate GetBidirectionalUpdatesStream
+
+GetBidirectionalUpdatesStream --> ClientStreamingThread : start thread
+activate ClientStreamingThread
+
+loop async foreach on client's stream 
+ClientStreamingThread <-- Client : change station name
+
+ClientStreamingThread -> GetBidirectionalUpdatesStream : update station name
+end loop
+
+Client --> ClientStreamingThread : cancel request
+ClientStreamingThread --> GetBidirectionalUpdatesStream : finish thread
+deactivate ClientStreamingThread
+
+GetBidirectionalUpdatesStream --> ServerStreamingThread : start thread
+activate ServerStreamingThread
+
+loop async foreach on server's stream
+Producent --> ServerStreamingThread : push update
+ServerStreamingThread -> Client : push update
+end loop
+
+Client --> ServerStreamingThread : cancel request
+ServerStreamingThread -> GetBidirectionalUpdatesStream : finish thread
+deactivate ServerStreamingThread
+
+GetBidirectionalUpdatesStream -> AirQConsumer : end request
+AirQConsumer -> Server : end request
+Server -> Client : end request
+AirQConsumer <-- Server : dispose
+@enduml

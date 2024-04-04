@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PlantUML", "PlantUML", "{85
 		gRPC_package.puml = gRPC_package.puml
 		archUnit.puml = archUnit.puml
 		gRPC_seq.puml = gRPC_seq.puml
+		gRPC_seq_server_1.puml = gRPC_seq_server_1.puml
 	EndProjectSection
 EndProject
 Global
