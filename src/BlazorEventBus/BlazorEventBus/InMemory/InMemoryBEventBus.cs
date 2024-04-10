@@ -4,7 +4,14 @@ namespace BlazorEventBus.InMemory;
 
 public sealed class InMemoryBEventBus : IBEventBus
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly SubscriptionsRepository _subscriptionsRepository = new SubscriptionsRepository();
+
+    public InMemoryBEventBus(IServiceProvider serviceProvider)
+    {
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+        _serviceProvider = serviceProvider;
+    }
 
     public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken token = default)
     {
