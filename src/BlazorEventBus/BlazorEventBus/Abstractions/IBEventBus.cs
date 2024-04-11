@@ -10,5 +10,3 @@ public interface IBEventBus
     IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent;
     IDisposable Subscribe<TEvent>(Func<TEvent, Task> handler) where TEvent : class, IEvent;
 }
-
-}
