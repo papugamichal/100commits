@@ -5,8 +5,7 @@ namespace BlazorEventBus.Abstractions;
 /// </summary>
 public interface IBEventBus
 {
-    Task PublishAsync(IEnumerable<IEvent> events, CancellationToken token = default);
-    Task PublishAsync(IEvent @event, CancellationToken token = default);
+    Task PublishAsync(params IEvent[] @event);
     IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent;
     IDisposable Subscribe<TEvent>(Func<TEvent, Task> handler) where TEvent : class, IEvent;
 }

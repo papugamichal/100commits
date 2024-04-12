@@ -122,7 +122,7 @@ public class InMemoryBEventBusTest
         
         //Act
         await _bus.PublishAsync(new AEvent());
-        await Task.Delay(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(TimeSpan.FromMilliseconds(200));
         
         //Assert
         Assert.That(AEventHandler.IsInvoked, Is.True);

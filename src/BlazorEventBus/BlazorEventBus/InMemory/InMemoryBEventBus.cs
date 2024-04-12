@@ -1,11 +1,12 @@
 using BlazorEventBus.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorEventBus.InMemory;
 
 public sealed class InMemoryBEventBus : IBEventBus
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly SubscriptionsRepository _subscriptionsRepository = new SubscriptionsRepository();
+    private readonly SubscriptionsRepository _subscriptionsRepository = new();
 
     public InMemoryBEventBus(IServiceProvider serviceProvider)
     {
@@ -13,14 +14,45 @@ public sealed class InMemoryBEventBus : IBEventBus
         _serviceProvider = serviceProvider;
     }
 
-    public Task PublishAsync(IEnumerable<IEvent> events, CancellationToken token = default)
+    public async Task PublishAsync(params IEvent[] events)
     {
-        throw new NotImplementedException();
+        var array = events.ToArray();
+        if (array.Length == 0)
+            return;
+
+        Task[] tasks;
+        lock (_subscriptionsRepository)
+        {
+            tasks = array.Select(PublishAsync).ToArray();
+        }
+
+        await Task.WhenAll(tasks);
     }
 
-    public Task PublishAsync(IEvent @event, CancellationToken token = default)
+    private Task PublishAsync(IEvent? @event)
     {
-        throw new NotImplementedException();
+        if (@event is null)
+            return Task.CompletedTask;
+
+        List<ISubscription> subscribers;
+        lock (_subscriptionsRepository)
+        {
+            subscribers = _subscriptionsRepository.Find(subscription => subscription.IsListenerOf(@event)).ToList();
+        }
+
+        _ = Task.Run(() =>
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var handlerType = typeof(IEventHandler<>).MakeGenericType(@event.GetType());
+            var handlerMethod = handlerType.GetMethod(nameof(IEventHandler<IEvent>.HandleAsync));
+            var eventHandlers = scope.ServiceProvider.GetServices(handlerType).ToList();
+
+            var subscriptionsTasks = subscribers.Select(subscription => Task.Run(() => subscription.Invoke(@event))).ToArray();
+            var handlersTasks = eventHandlers.Select(handler => Task.Run(() => handlerMethod!.Invoke(handler, [@event, (CancellationToken)(default)]) as Task)).ToArray();
+            Task.WaitAll(subscriptionsTasks.Concat(handlersTasks).ToArray());
+        });
+        
+        return Task.CompletedTask;
     }
 
     public IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent
@@ -62,7 +94,7 @@ public sealed class InMemoryBEventBus : IBEventBus
 
     private interface ISubscription
     {
-        public bool IsListener(IEvent? @event);
+        public bool IsListenerOf(IEvent? @event);
         
         public void Invoke(IEvent @event);
     }
@@ -82,7 +114,7 @@ public sealed class InMemoryBEventBus : IBEventBus
             _handler = handler;
         }
 
-        public bool IsListener(IEvent? @event)
+        public bool IsListenerOf(IEvent? @event)
         {
             if (@event is null)
                 return false;
