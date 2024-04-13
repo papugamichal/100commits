@@ -3,7 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorEventBus.InMemory;
 
-public sealed class InMemoryBEventBus : IBEventBus
+/// <summary>
+/// Blazor event bus implementation working in-memory  
+/// </summary>
+internal sealed class InMemoryBEventBus : IBEventBus
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly SubscriptionsRepository _subscriptionsRepository = new();
@@ -29,6 +32,21 @@ public sealed class InMemoryBEventBus : IBEventBus
         await Task.WhenAll(tasks);
     }
 
+    public IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent
+    {
+        lock (_subscriptionsRepository)
+        {
+            var subscription = new EventSubscription<TEvent>(this, handler);
+            _subscriptionsRepository.Add(subscription);
+            return subscription;
+        }
+    }
+
+    public IDisposable Subscribe<TEvent>(Func<TEvent, Task> handler) where TEvent : class, IEvent
+    {
+        throw new NotImplementedException();
+    }
+
     private Task PublishAsync(IEvent? @event)
     {
         if (@event is null)
@@ -47,27 +65,14 @@ public sealed class InMemoryBEventBus : IBEventBus
             var handlerMethod = handlerType.GetMethod(nameof(IEventHandler<IEvent>.HandleAsync));
             var eventHandlers = scope.ServiceProvider.GetServices(handlerType).ToList();
 
-            var subscriptionsTasks = subscribers.Select(subscription => Task.Run(() => subscription.Invoke(@event))).ToArray();
-            var handlersTasks = eventHandlers.Select(handler => Task.Run(() => handlerMethod!.Invoke(handler, [@event, (CancellationToken)(default)]) as Task)).ToArray();
+            var subscriptionsTasks = subscribers.Select(subscription => Task.Run(() => subscription.Invoke(@event)))
+                .ToArray();
+            var handlersTasks = eventHandlers
+                .Select(handler => Task.Run(() => handlerMethod!.Invoke(handler, [@event, default]) as Task)).ToArray();
             Task.WaitAll(subscriptionsTasks.Concat(handlersTasks).ToArray());
         });
-        
+
         return Task.CompletedTask;
-    }
-
-    public IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent
-    {
-        lock (_subscriptionsRepository)
-        {
-            var subscription = new EventSubscription<TEvent>(this, handler);
-            _subscriptionsRepository.Add(subscription);
-            return subscription;
-        }
-    }
-
-    public IDisposable Subscribe<TEvent>(Func<TEvent, Task> handler) where TEvent : class, IEvent
-    {
-        throw new NotImplementedException();
     }
 
     private void Unsubscribe(ISubscription subscription)
@@ -82,20 +87,26 @@ public sealed class InMemoryBEventBus : IBEventBus
     {
         private readonly List<ISubscription> _subscriptions = [];
 
-        public void Add(ISubscription subscription) =>
+        public void Add(ISubscription subscription)
+        {
             _subscriptions.Add(subscription);
-        
-        public void Remove(ISubscription subscription) =>
+        }
+
+        public void Remove(ISubscription subscription)
+        {
             _subscriptions.Remove(subscription);
-        
-        public IEnumerable<ISubscription> Find(Func<ISubscription, bool> predicate) =>
-            _subscriptions.Where(predicate).ToArray();
+        }
+
+        public IEnumerable<ISubscription> Find(Func<ISubscription, bool> predicate)
+        {
+            return _subscriptions.Where(predicate).ToArray();
+        }
     }
 
     private interface ISubscription
     {
         public bool IsListenerOf(IEvent? @event);
-        
+
         public void Invoke(IEvent @event);
     }
 
@@ -114,6 +125,12 @@ public sealed class InMemoryBEventBus : IBEventBus
             _handler = handler;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public bool IsListenerOf(IEvent? @event)
         {
             if (@event is null)
@@ -123,13 +140,9 @@ public sealed class InMemoryBEventBus : IBEventBus
             return subscriptionEventType.IsInstanceOfType(@event);
         }
 
-        public void Invoke(IEvent @event) =>
-            _handler.Invoke(@event as TEvent);
-
-        public void Dispose()
+        public void Invoke(IEvent @event)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            _handler.Invoke(@event as TEvent);
         }
 
         private void Dispose(bool disposing)
@@ -141,6 +154,9 @@ public sealed class InMemoryBEventBus : IBEventBus
             _handler = null;
         }
 
-        ~EventSubscription() { Dispose(false); }
+        ~EventSubscription()
+        {
+            Dispose(false);
+        }
     }
 }

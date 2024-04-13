@@ -6,10 +6,10 @@ namespace BlazorEventBus.UnitTests;
 
 public class InMemoryBEventBusTest
 {
-    private IServiceProvider _serviceProvider;
     private InMemoryBEventBus _bus;
     private List<IDisposable> _disposables;
-    
+    private IServiceProvider _serviceProvider;
+
     [SetUp]
     public void Setup()
     {
@@ -37,14 +37,14 @@ public class InMemoryBEventBusTest
             Thread.Sleep(TimeSpan.FromMilliseconds(2));
             invoked = true;
         }));
-        
+
         //Act
         await _bus.PublishAsync(new AEvent());
-        
+
         //Assert
         Assert.That(invoked, Is.False);
     }
-    
+
     [Test]
     public async Task WhenEventIsPublished_AllCorrespondingHandlersConfiguredAsDelegatesAreInvoked()
     {
@@ -56,11 +56,11 @@ public class InMemoryBEventBusTest
         _disposables.Add(_bus.Subscribe<AEvent>(_ => invokedA2 = true));
         _disposables.Add(_bus.Subscribe<BEvent>(_ => invokedB = true));
 
-        
+
         //Act
         await _bus.PublishAsync(new AEvent());
         await Task.Delay(TimeSpan.FromMilliseconds(100));
-        
+
         //Assert
         Assert.Multiple(() =>
         {
@@ -101,11 +101,11 @@ public class InMemoryBEventBusTest
         _disposables.Add(_bus.Subscribe<AEvent>(_ => invokedA = true));
         _disposables.Add(_bus.Subscribe<BEvent>(_ => invokedB = true));
 
-        
+
         //Act
         await _bus.PublishAsync(new AEvent());
         await Task.Delay(TimeSpan.FromMilliseconds(100));
-        
+
         //Assert
         Assert.Multiple(() =>
         {
@@ -113,33 +113,37 @@ public class InMemoryBEventBusTest
             Assert.That(invokedB, Is.False);
         });
     }
-    
+
     [Test]
     public async Task WhenEventIsPublished_CorrespondingScopedServiceHandlerIsInvoked()
     {
         //Arrange
         AEventHandler.IsInvoked = false;
-        
+
         //Act
         await _bus.PublishAsync(new AEvent());
         await Task.Delay(TimeSpan.FromMilliseconds(200));
-        
+
         //Assert
         Assert.That(AEventHandler.IsInvoked, Is.True);
     }
 
-    public class AEvent : IEvent {}
+    public class AEvent : IEvent
+    {
+    }
 
-    public class BEvent : IEvent {}
- 
+    public class BEvent : IEvent
+    {
+    }
+
 
     public class AEventHandler : IEventHandler<AEvent>
     {
-        public static bool IsInvoked { get; set; } = false;
-        
+        public static bool IsInvoked { get; set; }
+
         public async Task HandleAsync(AEvent @event, CancellationToken token = default)
         {
             IsInvoked = true;
         }
-    }   
+    }
 }
