@@ -36,7 +36,8 @@ See more info here: https://100commitow.pl/
 9. Architecture:
    -[x] ArchUnitNET
 10. Event bus to synchronize Blazor components (Blazor WebServer)
- - [ ] Component can subscribe for <TEvent>
- - [ ] Subscription is unregistered when component is disposed
- - [ ] Adapter: In-Memory version
- - [ ] Adapter: RabbitMq
+    - [x] Component can subscribe for <TEvent> (with sync delegate)
+    - [ ] Component can subscribe for <TEvent> (with async delegate)
+    - [ ] Subscription is unregistered when component is disposed
+    - [x] Adapter: In-Memory version
+    - [ ] Adapter: RabbitMq
