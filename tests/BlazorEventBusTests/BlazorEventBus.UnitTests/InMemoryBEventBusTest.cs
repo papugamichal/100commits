@@ -70,27 +70,29 @@ public class InMemoryBEventBusTest
         });
     }
 
-    //Uncomment when Subscribe<TEvent>(Func<TEvent, Task> handler) is implemented
-    // [Test]
-    // public async Task WhenEventIsPublished_AllCorrespondingAsyncDelegateHandlersAreInvoked()
-    // {
-    //     //Arrange
-    //     var invokedA1 = false;
-    //     var invokedA2 = false;
-    //     var invokedB = false;
-    //     _disposables.Add(_bus.Subscribe<AEvent>(_ => Task.FromResult(invokedA1 = true)));
-    //     _disposables.Add(_bus.Subscribe<AEvent>(_ => Task.FromResult(invokedA1 = true)));
-    //     _disposables.Add(_bus.Subscribe<BEvent>(_ => Task.FromResult(invokedB = true)));
-    //
-    //     //Act
-    //     await _bus.PublishAsync(new AEvent());
-    //     await Task.Delay(TimeSpan.FromMilliseconds(100));
-    //     
-    //     //Assert
-    //     Assert.That(invokedA1, Is.True);
-    //     Assert.That(invokedA2, Is.True);
-    //     Assert.That(invokedB, Is.False);
-    // }
+    [Test]
+    public async Task WhenEventIsPublished_AllCorrespondingAsyncDelegateHandlersAreInvoked()
+    {
+        //Arrange
+        var invokedA1 = false;
+        var invokedA2 = false;
+        var invokedB = false;
+        _disposables.Add(_bus.Subscribe<AEvent>(_ => Task.FromResult(invokedA1 = true)));
+        _disposables.Add(_bus.Subscribe<AEvent>(_ => Task.FromResult(invokedA2 = true)));
+        _disposables.Add(_bus.Subscribe<BEvent>(_ => Task.FromResult(invokedB = true)));
+    
+        //Act
+        await _bus.PublishAsync(new AEvent());
+        await Task.Delay(TimeSpan.FromMilliseconds(100));
+        
+        //Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(invokedA1, Is.True);
+            Assert.That(invokedA2, Is.True);
+            Assert.That(invokedB, Is.False);
+        });
+    }
 
     [Test]
     public async Task WhenEventIsPublished_CorrespondingDelegateHandlerIsInvoked()
