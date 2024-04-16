@@ -63,7 +63,7 @@ internal sealed class InMemoryBEventBus : IBEventBus
             subscribers = _subscriptionsRepository.Find(subscription => subscription.IsListenerOf(@event)).ToList();
         }
 
-        _ = Task.Run(() =>
+        return Task.Run(async () =>
         {
             using var scope = _serviceProvider.CreateScope();
             var handlerType = typeof(IEventHandler<>).MakeGenericType(@event.GetType());
@@ -76,10 +76,8 @@ internal sealed class InMemoryBEventBus : IBEventBus
             var handlersTasks = eventHandlers
                 .Select(handler => Task.Run(() => handlerMethod!.Invoke(handler, [@event, default]) as Task))
                 .ToArray();
-            Task.WaitAll(subscriptionsTasks.Concat(handlersTasks).ToArray());
+            await Task.WhenAll(subscriptionsTasks.Concat(handlersTasks).ToArray());
         });
-
-        return Task.CompletedTask;
     }
 
     private void Unsubscribe(ISubscription subscription)
@@ -120,14 +118,14 @@ internal sealed class InMemoryBEventBus : IBEventBus
     private class EventSubscription<TEvent> : ISubscription, IDisposable
         where TEvent : class, IEvent
     {
+        private bool _disposed;
         private readonly InMemoryBEventBus _eventBus;
         private Func<TEvent, Task>? _asyncHandler;
         private Action<TEvent>? _handler;
-
+        
         private EventSubscription(InMemoryBEventBus eventBus)
         {
             ArgumentNullException.ThrowIfNull(eventBus);
-
             _eventBus = eventBus;
         }
 
@@ -155,14 +153,16 @@ internal sealed class InMemoryBEventBus : IBEventBus
 
         public async Task InvokeAsync(IEvent @event)
         {
-            var arg = @event as TEvent;
-            if (_asyncHandler is not null)
+            if (@event is TEvent args)
             {
-                await _asyncHandler.Invoke(arg);
-                return;
-            }
+                if (_asyncHandler is not null)
+                {
+                    await _asyncHandler.Invoke(args);
+                    return;
+                }
             
-            _handler?.Invoke(arg);
+                _handler?.Invoke(args); 
+            }
         }
 
         public void Dispose()
@@ -173,11 +173,13 @@ internal sealed class InMemoryBEventBus : IBEventBus
         
         private void Dispose(bool disposing)
         {
-            if (!disposing)
+            if (!disposing || _disposed)
                 return;
 
             _eventBus.Unsubscribe(this);
             _handler = null;
+            
+            _disposed = true;
         }
 
         ~EventSubscription()

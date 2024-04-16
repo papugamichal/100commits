@@ -28,16 +28,17 @@ public class InMemoryBEventBusTest
     }
 
     [Test]
-    public async Task WhenEventIsPublished_DoNotWaitForHandlersToBeInvoked()
+    public async Task WhenSubscriptionIsDisposed_AndEventIsPublished_ThenSubscriptionDelegateIsNotInvoked()
     {
         //Arrange
         var invoked = false;
-        _disposables.Add(_bus.Subscribe<AEvent>(_ =>
+        var subscription = _bus.Subscribe<AEvent>(_ =>
         {
             Thread.Sleep(TimeSpan.FromMilliseconds(2));
             invoked = true;
-        }));
-
+        });
+        subscription.Dispose();
+        
         //Act
         await _bus.PublishAsync(new AEvent());
 
