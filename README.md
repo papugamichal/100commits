@@ -38,6 +38,7 @@ See more info here: https://100commitow.pl/
 10. Event bus to synchronize Blazor components (Blazor WebServer)
     - [x] Component can subscribe for <TEvent> (with sync delegate)
     - [x] Component can subscribe for <TEvent> (with async delegate)
-    - [ ] Subscription is unregistered when component is disposed
-    - [x] Adapter: In-Memory version
+    - [x] Subscription is unregistered when token is disposed
+    - [x] Adapter: In-Memory (subscription as a token)
+    - [ ] Adapter: In-Memory (subscription as a stream) [NEED REFINEMENT]
     - [ ] Adapter: RabbitMq
