@@ -6,9 +6,14 @@ namespace BlazorEventBus.InMemory;
 
 internal class InMemoryChannelBEventBus : IBEventBus
 {
-    public Task PublishAsync(params IEvent[] @event)
+    public async Task PublishAsync(params IEvent[] @event)
     {
-        throw new NotImplementedException();
+        var eventListeners = new Dictionary<Type, Channel<object>>();
+        foreach (var single in @event.ToArray())
+        {
+            var eventType = single.GetType();
+            await eventListeners[eventType].Writer.WriteAsync(single);
+        }
     }
 
     public IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent
@@ -25,45 +30,63 @@ internal class InMemoryChannelBEventBus : IBEventBus
     [MustDisposeResource]
     private sealed class Subscription<TEvent> : IDisposable where TEvent : IEvent
     {
-        private readonly Func<TEvent, Task> _handler;
-        private Func<TEvent, Task> handler;
+        private readonly CancellationTokenSource _subscriptionLifetimeTokenSource = new();
+        private readonly Task _channelReaderTask;
+        private readonly InMemoryChannelBEventBus _clazz;
+        
+        private bool _disposed;
         
         public Subscription(InMemoryChannelBEventBus clazz, Func<TEvent, Task> handler)
         {
-            _handler = handler;
-            
             var channel = Channel.CreateBounded<TEvent>(1);
-            var t = Task.Run(async () =>
+            _channelReaderTask = Task.Run(async () =>
             {
-                await foreach (var @event in channel.Reader.ReadAllAsync(CancellationToken.None))
+                await foreach (var @event in channel.Reader.ReadAllAsync(_subscriptionLifetimeTokenSource.Token))
                 {
                     await handler(@event);
                 };
             });
 
+            _clazz = clazz;
             clazz.RegisterSubscription<TEvent>(this);
 
         }
-        private void ReleaseUnmanagedResources()
+        private void DisposePrivate(bool dispose)
         {
-            // TODO release unmanaged resources here
+            if (!dispose || _disposed)
+                return;
+            
+            _subscriptionLifetimeTokenSource.CancelAsync()
+                .ConfigureAwait(false).GetAwaiter().GetResult();
+            
+            _channelReaderTask?.ConfigureAwait(false)
+                .GetAwaiter().GetResult();
+
+            _clazz?.UnregisterSubscription(this);
+            _disposed = true;
         }
 
         [HandlesResourceDisposal]
         public void Dispose()
         {
-            ReleaseUnmanagedResources();
+            DisposePrivate(true);
             GC.SuppressFinalize(this);
         }
 
         ~Subscription()
         {
-            ReleaseUnmanagedResources();
+            DisposePrivate(false);
         }
+    }
+
+    private void UnregisterSubscription<TEvent>(Subscription<TEvent> subscription) where TEvent : IEvent
+    {
+        throw new NotImplementedException();
     }
 
     private void RegisterSubscription<TEvent>(Subscription<TEvent> subscription) where TEvent : IEvent
     {
+        
         throw new NotImplementedException();
     }
 }
