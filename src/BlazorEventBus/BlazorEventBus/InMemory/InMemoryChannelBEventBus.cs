@@ -16,9 +16,14 @@ internal class InMemoryChannelBEventBus : IBEventBus
         }
     }
 
+    [MustDisposeResource]
     public IDisposable Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class, IEvent
     {
-        throw new NotImplementedException();
+        return new Subscription<TEvent>(this, @event =>
+        {
+            handler(@event);
+            return Task.CompletedTask;
+        });
     }
 
     [MustDisposeResource]
