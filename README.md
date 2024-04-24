@@ -43,4 +43,5 @@ See more info here: https://100commitow.pl/
     - [ ] Adapter: In-Memory (subscription as a stream) [NEED REFINEMENT]
     - [ ] Adapter: RabbitMq
 11. TBD
-    - [] 
+    - [ ]
+    - [ ]
